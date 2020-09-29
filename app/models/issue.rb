@@ -118,6 +118,9 @@ class Issue < ActiveRecord::Base
   after_destroy :update_parent_attributes
   after_create_commit :send_notification
 
+  # Bind extra issue logic to when it's needed (after_save, after_create, after_commit etc.)
+  after_update :do_extra_logic
+
   # Returns a SQL conditions string used to find all issues visible by the specified user
   def self.visible_condition(user, options={})
     Project.allowed_to_condition(user, :view_issues, options) do |role, user|
@@ -1905,5 +1908,13 @@ class Issue < ActiveRecord::Base
       end
       self.done_ratio ||= 0
     end
+  end
+
+  def do_extra_logic
+    args = {
+      parent_id: self.id
+    }
+
+    CreateExtraIssuesJob.perform_later(args)
   end
 end
