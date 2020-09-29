@@ -47,6 +47,9 @@ group :markdown do
   gem "redcarpet", "~> 3.5.0"
 end
 
+# Background processing
+gem 'sidekiq'
+
 # Include database gems for the adapters found in the database
 # configuration file
 require 'erb'
